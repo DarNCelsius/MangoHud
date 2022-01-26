@@ -93,8 +93,8 @@ void msg_read_thread(){
 
 static const char *GamescopeOverlayProperty = "GAMESCOPE_EXTERNAL_OVERLAY";
 
-GLFWwindow* init(GLFWwindow* window, const char* glsl_version){
-    window = glfwCreateWindow(1280, 720, "mangoapp overlay window", NULL, NULL);
+GLFWwindow* init(const char* glsl_version){
+    GLFWwindow* window = glfwCreateWindow(1280, 720, "mangoapp overlay window", NULL, NULL);
     Display *x11_display = glfwGetX11Display();
     Window x11_window = glfwGetX11Window(window);
     if (x11_window && x11_display)
@@ -123,7 +123,7 @@ void shutdown(GLFWwindow* window){
 }
 
 int main(int, char**)
-{   
+{
     // Setup window
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
@@ -137,7 +137,7 @@ int main(int, char**)
     glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, 1);
 
     // Create window with graphics context
-    GLFWwindow* window = init(window, glsl_version);;
+    GLFWwindow* window = init(glsl_version);
     // Initialize OpenGL loader
 
     bool err = glewInit() != GLEW_OK;
@@ -154,7 +154,7 @@ int main(int, char**)
     device_data->instance->params = {};
     params = &device_data->instance->params;
     parse_overlay_config(params, getenv("MANGOHUD_CONFIG"));
-    create_fonts(*params, sw_stats.font1, sw_stats.font_text);
+    create_fonts(nullptr, *params, sw_stats.font1, sw_stats.font_text);
     HUDElements.convert_colors(*params);
     init_cpu_stats(*params);
     notifier.params = params;
@@ -177,8 +177,8 @@ int main(int, char**)
     while (!glfwWindowShouldClose(window)){
         if (!params->no_display){
             if (mangoapp_paused){
-                window = init(window, glsl_version);
-                create_fonts(*params, sw_stats.font1, sw_stats.font_text);
+                window = init(glsl_version);
+                create_fonts(nullptr, *params, sw_stats.font1, sw_stats.font_text);
                 HUDElements.convert_colors(*params);
                 mangoapp_paused = false;
             }
@@ -203,8 +203,8 @@ int main(int, char**)
             static int display_w, display_h;
             glfwSetWindowSize(window, window_size.x + 45.f, window_size.y + 325.f);
             glfwGetFramebufferSize(window, &display_w, &display_h);
-            glEnable(GL_DEPTH_TEST);        
-            glEnable(GL_BLEND);             
+            glEnable(GL_DEPTH_TEST);
+            glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             glClearColor(0, 0, 0, 0);
             glClear(GL_COLOR_BUFFER_BIT);
